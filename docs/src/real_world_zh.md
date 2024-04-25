@@ -2,7 +2,7 @@
 
 ## 易于使用的本地目录
 
-当您使用[`initialize_project`](@ref)函数按照DrWatson推荐的方式设置您的科学计算项目，那么每个项目中的每个文件都会以如下方式开头：
+当您按照DrWatson推荐的方式，即使用[`initialize_project`](@ref)函数来设置您的科学计算项目，那么每个项目中的每个文件都会以如下方式开头：
 
 ```julia
 using DrWatson
@@ -12,13 +12,14 @@ using DynamicalBilliards, GLMakie, LinearAlgebra
 include(srcdir("plot_perturbationgrowth.jl"))
 include(srcdir("unitcells.jl"))
 ```
-在所有项目中，均使用`datadir/plotsdir`保存数据和绘图：
+所有项目均使用`datadir/plotsdir`保存数据和绘图：
 ```julia
 @tagsave(datadir("mushrooms", "Λ_N=$N.jld2"), (@strdict(Λ, Λσ, ws, hs, description)))
 ```
-这种方法的优点是，无论您将特定文件移动到不同的子文件夹中（这种情况经常发生），还是将整个项目文件夹移动到其他地方，它都可以正常工作！
+这种方法的优点是，无论是将特定文件移动到不同的子文件夹中（这种情况经常发生），还是将整个项目文件夹移动到其他地方，它都可以正常工作！
 **请确保您已经理解使用[`quickactivate`](@ref)的注意事项！**
-这是另一个项目的示例。您会注意到它另一个优点：即使存在不同的项目，您也可以使用相同的语法访问数据或源文件夹！
+
+这是给出了另一个项目的示例。您会注意到它另一个优点：即使存在不同的项目，也可以使用相同的语法访问数据或源文件夹！
 ```julia
 using DrWatson
 @quickactivate "EmbeddingResearch"
@@ -34,7 +35,7 @@ save(datadir("sim", "barkley", "astonishing_results.jld2"), data)
 ```
 
 ## 将您的项目转化为一个可用的模组
-对于某些项目，通常情况下需要在 _项目中的每个文件_ 的开头加载源文件夹中的一些包和文件。举例来说，我项目中  _任何_ 编写的脚本的前五行代码都会是：
+对于某些项目，通常情况下需要在 _项目中的每个文件_ 的开头加载源文件夹中的一些包和文件。举例来说，如果某个项目中编写的 _任何_ 脚本的前五行代码都是：
 
 ```julia
 using DrWatson
@@ -43,9 +44,11 @@ using Dates, Statistics, NCDatasets
 include(srcdir("core.jl"))
 include(srcdir("style.jl"))
 ```
-将所有命令放在一个代码文件中并加载该文件会对我们来说十分方便，例如执行`include(srcdir("everything.jl"))`来运行包含所有指令的文件。
-但是，我们可以做得更好！得益于Julia处理项目和模块路径的方式，我们事实上可以当前活动的项目转换为可用的模组。如果在`src`文件夹中定义了一个`AlbedoProperties.jl`文件，其中包含一个名为`AlbedoProperties`的模组（请注意模组名称必须与项目文件名称 _完全匹配_）,那么当执行 `using AlbedoProperties`时，Julia实际上只是将这个模组引入作用域。
-因此，对于一些需要类似操作的项目，我最终的操作是创建上述的文件并在其中添加以下内容：
+将所有这些命令放在一个代码文件中并加载该文件将十分方便，例如执行`include(srcdir("everything.jl"))`来运行包含所有指令的文件。
+
+但是，我们可以做得更好！得益于Julia处理项目和模块路径的方式，实际上可以将当前活动的项目转换为可用的模组。如果在`src`文件夹中创建了一个`AlbedoProperties.jl`文件，其中包含一个名为`AlbedoProperties`的模组（请注意模组名称必须与项目文件名称 _完全匹配_）,那么当执行 `using AlbedoProperties`时，Julia实际上只是将这个模组引入作用域。
+
+因此，对于一些需要类似操作的项目，最终需要的操作仅是创建上述的文件并在其中添加以下内容：
 ```julia
 module AlbedoProperties
 
@@ -65,8 +68,7 @@ using DrWatson
 ```
 它利用了 [`@quickactivate`](@ref)的特性，实质上结合了`@quickactivate "AlbedoProperties"`和`using AlbedoProperties`两个命令的功能。
 
-## `savename` and 项目标签
-The combination of using [`savename`](@ref) and [`tagsave`](@ref) makes it easy and fast to save output in a way that is consistent, robust and reproducible. Here is an example from a project:
+## `savename` 和 项目标签
 
 结合使用[`savename`](@ref)和[`tagsave`](@ref)可以轻松快速地保存输出结果，并且保证了结果的一致性、稳健性和可重复性。以下是一个项目的示例：
 ```julia
@@ -95,11 +97,12 @@ end
 ```
 path/to/project/data/sim/bk_N=50_T=10050_seed=1111_ΔT=1.jld2
 ```
-每个文件都是字典类型，包含了`:U, :V, :simulation`数据字段。同时，文件还包含了`:gitcommit, :script`等字段。当我读取这个文件时，我就能准确地知道是什么代码生成了它（前提是我没有忘记定期提交代码更改:P）。
+每个文件都是字典类型，包含了`:U, :V, :simulation`数据字段。同时，文件还包含了`:gitcommit, :script`等字段。当读取这个文件时，就能准确地知道是什么代码生成了它（前提是没有忘记定期提交代码更改:P）。
 
-## [自定义 `savename`](@id customizing_savename)
+## [自定义 `savename`](@id_customizing_savename)
+
 以下是自定义[`savename`](@ref)的简单示例。我们在此使用了一个通用的数据结构`Experiment`来记录猫鼠实验。
-首先我们定义相关的数据类型：
+首先定义相关的数据类型：
 ```@example customizing
 using DrWatson, Dates
 using Base: @kwdef # for defining structs with keyword values
@@ -123,7 +126,8 @@ e1 = Experiment()
 e2 = Experiment(species = Cat())
 ```
 为了分析我们的实验，我们需要实验使用的物种信息，并且为了在稍后使用多重分派功能，我们决定将这些信息与类型相关联。这就是我们定义 `Species`的原因。
-现在,我们想要自定义[`savename`](@ref)。我们首先扩展[`DrWatson.default_prefix`](@ref)：
+
+现在，我们想要自定义[`savename`](@ref)。首先扩展[`DrWatson.default_prefix`](@ref)：
 ```@example customizing
 DrWatson.default_prefix(e::Experiment) = "Experiment_"*string(e.date)
 
@@ -145,7 +149,7 @@ savename(e1)
 ```@example customizing
 DrWatson.allaccess(::Experiment) = (:n, :c, :x, :species)
 ```
-这样只有这四个字段将被使用(注意`date`字段已经在`default_prefix`中被使用了)。最终我们可以得到:
+这样只有这四个字段将被使用(注意，`date`字段已经在`default_prefix`中被使用了)。最终可以得到:
 ```@example customizing
 println( savename(e1) )
 println( savename(e2) )
@@ -153,7 +157,7 @@ println( savename(e2) )
 
 ## `savename` 和嵌套容器
 对于用户定义的结构体和相当复杂的项目，通常需要将其他容器作为子字段包含在“主”容器中。`savename`也可以适应这些情况。
-考虑以下示例，其中我需要一个核心结构来表示一个时空系统模型及其数值模拟：
+考虑以下示例，其中需要一个核心结构来表示一个时空系统模型及其数值模拟：
 ```@example customizing
 struct SpatioTemporalSystem
     model::String # system codeword
@@ -173,6 +177,7 @@ const STT = SpatioTemporalTimeseries
 ```
 在我的用例中，`p` 可以是`nothing`，也可以是包含了时空模型的参数集的字典。
 为了让`savename`适用于这种情况，我们使用[`DrWatson.default_expand`](@ref)的相关功能。
+
 扩展所需的方法使得我可以这样做：
 ```@example customizing
 DrWatson.allaccess(c::STS) = (:N, :Δt, :p)
@@ -198,8 +203,10 @@ savename(stt)
 
 ## 不再有“我到底有没有跑过这个模拟”的焦虑
 有那么一段代码让你感觉烦躁：你可能跑过也可能没有，可能保存了生成的数据也可能没有，那么你会不断自问：“我到底有没有跑过这个模拟？”。根据运行代码的成本高低，拥有一个良好的框架来回答这个问题可能非常重要！
-这就是 [`produce_or_load`](@ref)的作用。您可以将代码包装在一个函数中，然后 [`produce_or_load`](@ref) 将为您处理剩下的工作！我发现这项功能在生成论文数据图时特别有用。
-以下是一个例子；原来我有这样一段代码：
+
+这就是 [`produce_or_load`](@ref)的作用。您可以将代码包装在一个函数中，然后 [`produce_or_load`](@ref) 将为您处理剩下的工作！这项功能在生成论文数据图时特别有用。
+
+以下是一个例子；原来有这样一段代码：
 ```julia
 HTEST = 0.1:0.1:2.0
 WS = [0.5, 1.0, 1.5]
@@ -248,6 +255,7 @@ data, file = produce_or_load(
 ## 用哈希码来`produce_or_load`
 
 如上所示， 默认情况下[`produce_or_load`](@ref) 使用的是 [`savename`](@ref)从配置输入中提取文件名。此文件名用于检查程序是否已运行并保存了其输出。但是，在某些情况下，您可能有太多参数或复杂的嵌套结构，仅使用[`savename`](@ref)不能对它们进行编码或者并不是那么方便。
+
 幸运的是，我们可以使用基础Julia的`hash`函数代替[`savename`](@ref)，我们将在以下示例中进行说明。
 
 ```@example customizing
@@ -330,7 +338,7 @@ dicts = dict_list(general_args)
 println("Total dictionaries made: ", length(dicts))
 dicts[1]
 ```
-Also, using the type [`Derived`](@ref), we can have parameters that are computed depending on the value of other parameters:
+
 此外，使用 [`Derived`](@ref) 类型，我们可以得到依赖于其他参数值的计算参数：
 ```@example customizing
 using DrWatson
@@ -380,7 +388,7 @@ file = load(datadir("results", "barkley", filename))
 ```
 
 ### 使用串行集群
-如果我不能将 `dict_list` 的结果存储在内存中，那么我必须更改方法，从磁盘加载它们。这可以通过 [`tmpsave`](@ref) 函数轻松实现。
+如果不能将 `dict_list` 的结果存储在内存中，那么必须更改方法，从磁盘加载它们。这可以通过 [`tmpsave`](@ref) 函数轻松实现。
 
 与使用Julia通过`map/pmap`在一个进程中运行所有工作不同，可以使用Julia将多个工作提交到集群队列中。对于上面的示例，执行此操作的Julia程序如下所示：
 
@@ -401,8 +409,8 @@ cross_estimation(dict)
 即它只需加载`dict`并直接使用"主"函数`cross_estimation`。请别忘了定期清理`tmp`目录！你可以通过在 `runjob.jl`脚本的最后添加一行`rm(projectdir("_research", "tmp", f)`来做到这一点。
 
 ## 列出完成的模拟工作
-继续 [模拟前的准备 & 运行模拟](@ref)一节的内容，我们现在想将所有这些模拟的结果收集到一个单一的DataFrame中`DataFrame`。我们将使用[`collect_results!`](@ref)函数实现此目的。
-实际上非常简单！但是因为我们不想包含错误信息，所以必须将其列入黑名单：
+继续 [模拟前的准备 & 运行模拟](@ref)一节的内容，如果现在想将所有这些模拟的结果收集到一个单一的DataFrame中`DataFrame`。可以使用[`collect_results!`](@ref)函数实现此目的。
+实际上非常简单！但是由于不想包含错误信息，所以必须将其列入黑名单：
 ```@example customizing
 using DataFrames # this is necessary to access collect_results!
 bl = ["error"]
@@ -425,6 +433,7 @@ select!(res, Not(:path)) # don't show path this time
 
 ## 适配新的数据/参数
 我们继续上面的例子。但现在我们需要用一些新的参数运行一些新的模拟，这些参数原本 _不存在_ 于旧模拟中... 但是，DrWatson说 “没问题！( ￣▽￣)σ ” 
+
 让我们将这些新参数保存在一个不同的子文件夹中，以保持项目整洁有序：
 ```@example customizing
 general_args_new = Dict(
@@ -437,6 +446,7 @@ general_args_new = Dict(
 )
 ```
 如您所见，这里有两个在以前的模拟中不存在的参数，即`"symmetry", "symmetric_training"`。此外，在 _以前_ 模拟中存在的`"noise", "noisy_training"`参数在当前模拟中不存在。
+
 没关系，让我们运行新的模拟：
 ```@example customizing
 dicts = dict_list(general_args_new)
