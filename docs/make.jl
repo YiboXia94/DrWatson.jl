@@ -26,5 +26,5 @@ Downloads.download(
 include("build_docs_with_style.jl")
 
 build_docs_with_style(pages, DrWatson, UnPack;
-    expandfirst=["index.md"], warnonly=true,
+    expandfirst=["index_zh.md"], warnonly=true,
 )
